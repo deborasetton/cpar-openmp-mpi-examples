@@ -7,14 +7,14 @@
 
 #define WORKTAG        1
 #define DIETAG         2
-#define NUM_WORK_REQS  5
+#define NUM_WORK_REQS  10 
 
 void master();
 void slave();
 
 // Defines an array of 10 elements, each being a pointer to a function
 // that is void and receives has no arguments.
-void (*tab_func[5])();
+void (*tab_func[10])();
 
 void func0() {
   int result = 0;
@@ -41,6 +41,31 @@ void func4() {
   MPI_Send(&result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
 }
 
+void func5() {
+  int result = 5;
+  MPI_Send(&result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+}
+
+void func6() {
+  int result = 6;
+  MPI_Send(&result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+}
+
+void func7() {
+  int result = 7;
+  MPI_Send(&result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+}
+
+void func8() {
+  int result = 8;
+  MPI_Send(&result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+}
+
+void func9() {
+  int result = 9;
+  MPI_Send(&result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+}
+
 /**
  * Entry point.
  */
@@ -52,6 +77,11 @@ int main(int argc, char** argv) {
   tab_func[2] = func2;
   tab_func[3] = func3;
   tab_func[4] = func4;
+  tab_func[5] = func5;
+  tab_func[6] = func6;
+  tab_func[7] = func7;
+  tab_func[8] = func8;
+  tab_func[9] = func9;
 
   // Initialize MPI.
   MPI_Init(&argc, &argv);
@@ -92,8 +122,8 @@ void master() {
 
   // While there's work to be assigned, receive a result and assign more work.
   while (work >= 0) {
-    MPI_Recv(&result, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD,
-             &status);
+    MPI_Recv(&result, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    printf("[%d] Result received: %d\n", 0, result);
 
     MPI_Send(&work, 1, MPI_INT, status.MPI_SOURCE, WORKTAG, MPI_COMM_WORLD);
     work--;
@@ -101,8 +131,8 @@ void master() {
 
   // No more work to be assigned, so just receive and tell processes to stop.
   for (rank = 1; rank < world_size; rank++) {
-    MPI_Recv(&result, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD,
-             &status);
+    MPI_Recv(&result, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    printf("[%d] Result received: %d\n", 0, result);
 
     // Tell slaves to quit.
     MPI_Send(0, 0, MPI_INT, status.MPI_SOURCE, DIETAG, MPI_COMM_WORLD);
