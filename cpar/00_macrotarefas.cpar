@@ -1,0 +1,23 @@
+#include "fix.h"
+#include <stdio.h>
+#include <unistd.h>
+
+/* Task declaration */
+task spec task1();
+
+/* Task definition */
+task body task1()
+{
+  printf("Running task1...");
+  sleep(1);
+}
+
+int main() {
+  alloc_proc(1);
+
+  create 1, task1();
+
+  /* Wait for all tasks to finish before exiting. */
+  wait_all();
+  return 0;
+}
